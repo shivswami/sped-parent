@@ -40,7 +40,7 @@ public class CxfEndpointConfig {
 	private Environment env;
 	
 	@Bean
-	public CxfEndpoint wsRecepcaoEndpoint() throws Exception {
+	public CxfEndpoint wsRecepcaoEndpoint() {
 		CxfEndpoint endpoint = new CxfEndpoint();
 		endpoint.setAddress(env.getProperty(PROPERTIES_WSDL_RECEPCAO));
 		endpoint.setWsdlURL(WSDL_URL_RECEPCAO);
@@ -54,7 +54,7 @@ public class CxfEndpointConfig {
 	}
 	
 	@Bean
-	public CxfEndpoint wsConsultaEndpoint() throws Exception {
+	public CxfEndpoint wsConsultaEndpoint() {
 		CxfEndpoint endpoint = new CxfEndpoint();
 		endpoint.setAddress(env.getProperty(PROPERTIES_WSDL_CONSULTA));
 		endpoint.setWsdlURL(WSDL_URL_CONSULTA);
