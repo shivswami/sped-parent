@@ -7,6 +7,8 @@ package net.jlstechnology.efinanceira.service.util;
  */
 public class EfinanceiraUtil {
 	
+	private EfinanceiraUtil() {}
+	
 	private static final br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.ObjectFactory FACTORY_ENVIO_LOTES = new br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.ObjectFactory();
 	
 	/**

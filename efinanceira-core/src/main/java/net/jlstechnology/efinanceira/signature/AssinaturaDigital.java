@@ -21,6 +21,8 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.ElementProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,9 +30,7 @@ import org.w3c.dom.NodeList;
 
 public class AssinaturaDigital {
 	
-	//private static final String CAMINHO_CERTIFICADO = "E:/camel-efinanceira/src/main/resources/s106-2016.pfx";
-	//private static final String CAMINHO_CERTIFICADO = "E:/Arquitetura/efinanceira-cxf-rs/src/main/resources/Associacao.pfx";
-	private static final String CERTIFICADO = "s106-2016.pfx";
+	private static Logger log = LoggerFactory.getLogger(AssinaturaDigital.class);
 	
 	private static PrivateKey privateKey;
 	
@@ -69,10 +69,10 @@ public class AssinaturaDigital {
 			trimWhitespace(document);
 
 			{
-				X509Certificate cert = getCertificate(ClassLoader.getSystemResource(CERTIFICADO).toString()/*CAMINHO_CERTIFICADO*/, "");
+				X509Certificate cert = getCertificate("");
 				sig.addKeyInfo(cert);
 				sig.sign(privateKey);
-				System.out.println(i + ") Assinando evento " + uri);
+				log.debug("Assinando evento {}", uri);
 			}
 		}
 		
@@ -83,8 +83,7 @@ public class AssinaturaDigital {
 	private static Document getDocumentFactory(InputStream is) throws Exception {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
-		Document document = factory.newDocumentBuilder().parse(is);
-		return document;
+		return factory.newDocumentBuilder().parse(is);
 	}
 	
 	private static void trimWhitespace(Node node) {
@@ -98,31 +97,25 @@ public class AssinaturaDigital {
 		}
 	}
 	
-	private static X509Certificate getCertificate(String certificado, String senha) throws Exception {
-		//InputStream entrada = new FileInputStream(certificado);
-		//KeyStore ks = KeyStore.getInstance("pkcs12");
+	private static X509Certificate getCertificate(String senha) throws Exception {
 		KeyStore ks = KeyStore.getInstance("Windows-MY", "SunMSCAPI");
 		try {
-			//ks.load(entrada, senha.toCharArray());
 			ks.load(null, null);
 		} catch (IOException e) {
-			throw new Exception("Senha do Certificado Digital incorreta ou Certificado inválido.");
+			throw new IOException(e);
 		}
 
 		KeyStore.PrivateKeyEntry pkEntry = null;
 		Enumeration<String> aliasesEnum = ks.aliases();
 		while (aliasesEnum.hasMoreElements()) {
-			String alias = (String) aliasesEnum.nextElement();
+			String alias = aliasesEnum.nextElement();
 			if (ks.isKeyEntry(alias)) {
-				pkEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(alias,
-						new KeyStore.PasswordProtection(senha.toCharArray()));
+				pkEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(alias,	new KeyStore.PasswordProtection(senha.toCharArray()));
 				privateKey = pkEntry.getPrivateKey();
 				break;
 			}
 		}
-
-		X509Certificate cert = (X509Certificate) pkEntry.getCertificate();
-		return cert;
+		return (X509Certificate) pkEntry.getCertificate();
 	}
 	
 //	private static X509Certificate getCertificate(String certificado, String senha) throws Exception {

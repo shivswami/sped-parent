@@ -4,13 +4,10 @@ import javax.inject.Inject;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-//import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
-//import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
 import org.springframework.stereotype.Component;
 
-//import br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.ObjectFactory;
 import net.jlstechnology.efinanceira.processor.AddLoteEventosProcessor;
 import net.jlstechnology.efinanceira.service.IAberturaService;
 import net.jlstechnology.efinanceira.signature.AssinaturaDigital;
