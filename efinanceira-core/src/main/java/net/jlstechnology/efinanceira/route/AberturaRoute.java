@@ -52,8 +52,6 @@ public class AberturaRoute extends SpringRouteBuilder {
 		from("seda:gerarXmlAbertura").routeId("rota-gerar-abertura-xml")		              
 		  .to("file:target/www/xml/abertura/nao_assinado/?fileName=evtAberturaeFinanceira.xml&charset=utf-8")
 		  .pollEnrich("file:target/www/xml/abertura/nao_assinado/?fileName=evtAberturaeFinanceira.xml&charset=utf-8")
-		    //.unmarshal(dataFormat)
-		  .unmarshal().jaxb()
 		      .process(addLoteEventosProcessor)
 		        .end()
 		  .setHeader("nomeElemento", constant("evtAberturaeFinanceira"))
@@ -78,8 +76,6 @@ public class AberturaRoute extends SpringRouteBuilder {
 		from("seda:transmitirXmlAbertura?timeout=100000").routeId("rota-transmitir-abertura")
 		  .pollEnrich("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&charset=utf-8")
 		  .setHeader("XmlAssinado", simple("${body}"))
-		    //.unmarshal(dataFormat2)
-		      .unmarshal().jaxb()
 		      .process(new Processor() {
 					@Override
 					public void process(Exchange exchange) throws Exception {

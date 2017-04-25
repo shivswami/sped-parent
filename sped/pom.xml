@@ -17,12 +17,17 @@
         <yarn.version>v0.21.3</yarn.version>
     </properties>
 
-    <!-- <dependencies> -->
-    <!-- <dependency> -->
-    <!-- <groupId>net.jlstechnology</groupId> -->
-    <!-- <artifactId>efinanceira-core</artifactId> -->
-    <!-- </dependency> -->
-    <!-- </dependencies> -->
+    <dependencies>
+        <!-- <dependency> -->
+        <!-- <groupId>net.jlstechnology</groupId> -->
+        <!-- <artifactId>efinanceira-core</artifactId> -->
+        <!-- </dependency> -->
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>
@@ -95,16 +100,9 @@
                             <arguments>install --force</arguments>
                         </configuration>
                     </execution>
-                    <!-- <execution>
-						<id>webpack build prod</id>
-						<goals>
-							<goal>yarn</goal>
-						</goals>
-						<phase>generate-resources</phase>
-						<configuration>
-							<arguments>run webpack:prod</arguments>
-						</configuration>
-					</execution>-->
+                    <!-- <execution> <id>webpack build prod</id> <goals> <goal>yarn</goal> 
+						</goals> <phase>generate-resources</phase> <configuration> <arguments>run 
+						webpack:prod</arguments> </configuration> </execution> -->
                 </executions>
             </plugin>
             <plugin>

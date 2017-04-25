@@ -1,3 +1,7 @@
 camel:
   springboot:
     name: EFinanceiraContext
+spring:
+  main:
+    sources: net.jlstechnology.Application
+      
