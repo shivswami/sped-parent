@@ -31,8 +31,6 @@ import org.w3c.dom.NodeList;
 public class AssinaturaDigital {
 	
 	private static Logger log = LoggerFactory.getLogger(AssinaturaDigital.class);
-
-	private static final String CERTIFICADO = "s106-2016.pfx";
 	
 	private static PrivateKey privateKey;
 	
@@ -71,7 +69,7 @@ public class AssinaturaDigital {
 			trimWhitespace(document);
 
 			{
-				X509Certificate cert = getCertificate(ClassLoader.getSystemResource(CERTIFICADO).toString()/*CAMINHO_CERTIFICADO*/, "");
+				X509Certificate cert = getCertificate();
 				sig.addKeyInfo(cert);
 				sig.sign(privateKey);
 				log.debug("Assinando evento {}", uri);
@@ -99,57 +97,27 @@ public class AssinaturaDigital {
 		}
 	}
 	
-	private static X509Certificate getCertificate(String certificado, String senha) throws Exception {
+	private static X509Certificate getCertificate() throws Exception {
 		KeyStore ks = KeyStore.getInstance("Windows-MY", "SunMSCAPI");
 		try {
 			ks.load(null, null);
 		} catch (IOException e) {
-			throw new Exception("Senha do Certificado Digital incorreta ou Certificado inválido.");
+			throw new Exception("Senha do Certificado Digital incorreta ou Certificado inválido.", e);
 		}
 
 		KeyStore.PrivateKeyEntry pkEntry = null;
 		Enumeration<String> aliasesEnum = ks.aliases();
 		while (aliasesEnum.hasMoreElements()) {
-			String alias = (String) aliasesEnum.nextElement();
+			String alias = aliasesEnum.nextElement();
 			if (ks.isKeyEntry(alias)) {
 				pkEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(alias,
-						new KeyStore.PasswordProtection(senha.toCharArray()));
+						new KeyStore.PasswordProtection("".toCharArray()));
 				privateKey = pkEntry.getPrivateKey();
 				break;
 			}
 		}
-
-		X509Certificate cert = (X509Certificate) pkEntry.getCertificate();
-		return cert;
+		return (X509Certificate) pkEntry.getCertificate();
 	}
-	
-//	private static X509Certificate getCertificate(String certificado, String senha) throws Exception {
-//		//InputStream entrada = new FileInputStream(certificado);
-//		//KeyStore ks = KeyStore.getInstance("pkcs12");
-//		KeyStore ks = KeyStore.getInstance("Windows-MY", "SunMSCAPI");
-//		try {
-//			//ks.load(entrada, senha.toCharArray());
-//			ks.load(null, null);
-//		} catch (IOException e) {
-//			throw new Exception("Senha do Certificado Digital incorreta ou Certificado inválido.");
-//		}
-//
-//		KeyStore.PrivateKeyEntry pkEntry = null;
-//		Enumeration<String> aliasesEnum = ks.aliases();
-//		while (aliasesEnum.hasMoreElements()) {
-//			String alias = (String) aliasesEnum.nextElement();
-//			if (ks.isKeyEntry(alias)) {
-//				pkEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(alias,
-//						new KeyStore.PasswordProtection(senha.toCharArray()));
-//				privateKey = pkEntry.getPrivateKey();
-//				break;
-//			}
-//		}
-//
-//		X509Certificate cert = (X509Certificate) pkEntry.getCertificate();
-//
-//		return cert;
-//	}
 	
 	private static String outputXML(Node doc) throws TransformerException {
 
