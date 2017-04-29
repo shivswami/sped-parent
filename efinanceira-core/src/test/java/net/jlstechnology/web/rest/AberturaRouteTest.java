@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -32,7 +31,6 @@ public class AberturaRouteTest {
 	private static final String REST_URI_ABERTURA = "http://localhost:8080/services/efinanceira";
 	
 	private WebClient webClient;
-
 	
 	@Before
 	public void setup() {
@@ -41,12 +39,9 @@ public class AberturaRouteTest {
 
 	    webClient = WebClient.create( REST_URI_ABERTURA, Arrays.asList(jacksonJsonProvider));
 	    WebClient.getConfig( webClient ).getRequestContext()/*.put( LocalConduit.DIRECT_DISPATCH, Boolean.TRUE )*/;
-	    webClient.accept( "application/json" );
-	    
+	    webClient.accept( "application/json" );	    
 	}
 	 
-
-	@DirtiesContext
 	@Test
 	public void gerarXMLTest() throws DatatypeConfigurationException {
 		
