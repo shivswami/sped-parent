@@ -4,12 +4,13 @@ import javax.inject.Inject;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
 import org.springframework.stereotype.Component;
 
+import net.jlstechnology.efinanceira.processor.AddEnvioLoteEventosProcessor;
 import net.jlstechnology.efinanceira.processor.AddLoteEventosProcessor;
+import net.jlstechnology.efinanceira.processor.RetornoEventoProcessor;
 import net.jlstechnology.efinanceira.service.IAberturaService;
 import net.jlstechnology.efinanceira.signature.AssinaturaDigital;
 
@@ -23,9 +24,6 @@ public class AberturaRoute extends SpringRouteBuilder {
 	
 	@Inject
 	private Endpoint wsRecepcaoEndpoint;
-	
-	@Inject
-	private Processor retornoEventoProcessor;
 
 	@Override
 	public void configure() throws Exception {
@@ -64,18 +62,10 @@ public class AberturaRoute extends SpringRouteBuilder {
 		from("seda:transmitirXmlAbertura?timeout=100000").routeId("rota-transmitir-xml-abertura")
 		  .pollEnrich("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&charset=utf-8")
 		  .setHeader("XmlAssinado", simple("${body}"))
-		      .process(new Processor() {
-					@Override
-					public void process(Exchange exchange) throws Exception {
-						br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.EFinanceira loteEvento = exchange.getIn().getBody(br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.EFinanceira.class);
-						br.gov.fazenda.sped.ObjectFactory factory = new br.gov.fazenda.sped.ObjectFactory();
-						br.gov.fazenda.sped.LoteEventos loteEventos = factory.createLoteEventos();
-						loteEventos.getContent().add(loteEvento);
-						exchange.getIn().setBody(loteEventos);
-					}
-				}).to(wsRecepcaoEndpoint)
+		      .process(new AddEnvioLoteEventosProcessor())
+		        .to(wsRecepcaoEndpoint)
 		        .setBody(bodyAs(br.gov.fazenda.sped.ReceberLoteEventoResult.class))
-				.process(retornoEventoProcessor)
+				.process(new RetornoEventoProcessor())
 				  .end()
 				  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
 	}

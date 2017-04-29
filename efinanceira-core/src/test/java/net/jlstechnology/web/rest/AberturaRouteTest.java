@@ -20,8 +20,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
-import br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.EFinanceira;
-import br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.ObjectFactory;
 import net.jlstechnology.Application;
 
 @RunWith(SpringRunner.class)
@@ -63,7 +61,7 @@ public class AberturaRouteTest {
 		assertEquals(response.getStatus(), 200);
 	}
 	
-	private static EFinanceira getEfinanceira() throws DatatypeConfigurationException {
+	private static br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.EFinanceira getEfinanceira() throws DatatypeConfigurationException {
 		
 		br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.ObjectFactory factory = new br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.ObjectFactory();
 
@@ -119,7 +117,7 @@ public class AberturaRouteTest {
 		evtAberturaeFinanceira.setIdeEvento(ideEvento);
 		evtAberturaeFinanceira.setInfoAbertura(infoAbertura);
 
-		EFinanceira eFinanceira = new ObjectFactory().createEFinanceira();
+		br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.EFinanceira eFinanceira = factory.createEFinanceira();
 		eFinanceira.setEvtAberturaeFinanceira(evtAberturaeFinanceira);
 		return eFinanceira;		
 	}
