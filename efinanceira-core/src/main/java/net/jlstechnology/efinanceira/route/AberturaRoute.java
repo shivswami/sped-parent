@@ -43,7 +43,7 @@ public class AberturaRoute extends SpringRouteBuilder {
 		  .recipientList(simple("seda:${header.operationName}"));
 		
 		// ROTA CRIAR XML ABERTURA
-		from("seda:gerarXmlAbertura").routeId("rota-gerar-abertura-xml")
+		from("seda:criarXmlAbertura").routeId("rota-criar-xml-abertura")
 		.to("file:target/www/xml/abertura/nao_assinado/?fileName=evtAberturaeFinanceira.xml&charset=utf-8")
 		    .pollEnrich("file:target/www/xml/abertura/nao_assinado/?fileName=evtAberturaeFinanceira.xml&charset=utf-8")
 		        .unmarshal(dfAbertura) 
@@ -54,14 +54,14 @@ public class AberturaRoute extends SpringRouteBuilder {
 		    .to("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&charset=utf-8");
 		
 		// ROTA EXCLUIR XML ABERTURA
-		from("seda:excluirXmlAbertura").routeId("rota-excluir-abertura-xml")
-		  .pollEnrich("file:target/www/xml/abertura/assinado/?fileName=${body}&delete=true")
-		  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(201))
+		from("seda:deletarXmlAbertura").routeId("rota-deletar-xml-abertura")
+		  .pollEnrich("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&delete=true")
+		  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))
 		  .setBody(simple("null"))
 		.to("log:INFO");
 		
 		// TRANSMITIR
-		from("seda:transmitirXmlAbertura?timeout=100000").routeId("rota-transmitir-abertura")
+		from("seda:transmitirXmlAbertura?timeout=100000").routeId("rota-transmitir-xml-abertura")
 		  .pollEnrich("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&charset=utf-8")
 		  .setHeader("XmlAssinado", simple("${body}"))
 		      .process(new Processor() {
@@ -77,7 +77,7 @@ public class AberturaRoute extends SpringRouteBuilder {
 		        .setBody(bodyAs(br.gov.fazenda.sped.ReceberLoteEventoResult.class))
 				.process(retornoEventoProcessor)
 				  .end()
-				  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(201));
+				  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
 	}
 
 }

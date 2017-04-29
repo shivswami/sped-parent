@@ -43,10 +43,23 @@ public class AberturaRouteTest {
 	}
 	 
 	@Test
-	public void gerarXMLTest() throws DatatypeConfigurationException {
-		
+	public void gerarXMLTest() throws DatatypeConfigurationException {		
 		webClient.path("/abertura/xml");
 		Response response = webClient.post(getEfinanceira());
+		assertEquals(response.getStatus(), 200);
+	}
+	
+	@Test
+	public void transmitirXMLTest() throws DatatypeConfigurationException {
+		webClient.path("/abertura/xml/transmissao");
+		Response response = webClient.post(null);
+		assertEquals(response.getStatus(), 500);
+	}
+	
+	@Test
+	public void deletarXMLTest() throws DatatypeConfigurationException {
+		webClient.path("/abertura/xml");
+		Response response = webClient.delete();
 		assertEquals(response.getStatus(), 200);
 	}
 	

@@ -76,8 +76,7 @@ public class AssinaturaDigital {
 			}
 		}
 		
-		return outputXML(document);
-		
+		return outputXML(document);		
 	}
 	
 	private static Document getDocumentFactory(InputStream is) throws Exception {
