@@ -5,7 +5,7 @@ import org.apache.camel.Processor;
 
 import net.jlstechnology.efinanceira.service.util.EfinanceiraUtil;
 
-public class AddLoteEventosProcessor implements Processor {
+public class LoteEventosProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {

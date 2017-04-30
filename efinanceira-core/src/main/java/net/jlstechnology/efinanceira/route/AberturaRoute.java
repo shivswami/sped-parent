@@ -8,8 +8,8 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
 import org.springframework.stereotype.Component;
 
-import net.jlstechnology.efinanceira.processor.AddEnvioLoteEventosProcessor;
-import net.jlstechnology.efinanceira.processor.AddLoteEventosProcessor;
+import net.jlstechnology.efinanceira.processor.EnvioLoteEventosProcessor;
+import net.jlstechnology.efinanceira.processor.LoteEventosProcessor;
 import net.jlstechnology.efinanceira.processor.RetornoEventoProcessor;
 import net.jlstechnology.efinanceira.service.IAberturaService;
 import net.jlstechnology.efinanceira.signature.AssinaturaDigital;
@@ -45,7 +45,7 @@ public class AberturaRoute extends SpringRouteBuilder {
 		.to("file:target/www/xml/abertura/nao_assinado/?fileName=evtAberturaeFinanceira.xml&charset=utf-8")
 		    .pollEnrich("file:target/www/xml/abertura/nao_assinado/?fileName=evtAberturaeFinanceira.xml&charset=utf-8")
 		        .unmarshal(dfAbertura) 
-		        .process(new AddLoteEventosProcessor())
+		        .process(new LoteEventosProcessor())
 		            .end()
 		        .setHeader("nomeElemento", constant("evtAberturaeFinanceira"))
 		        .bean(AssinaturaDigital.class, "assinar")
@@ -62,7 +62,7 @@ public class AberturaRoute extends SpringRouteBuilder {
 		from("seda:transmitirXmlAbertura?timeout=100000").routeId("rota-transmitir-xml-abertura")
 		  .pollEnrich("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&charset=utf-8")
 		  .setHeader("XmlAssinado", simple("${body}"))
-		      .process(new AddEnvioLoteEventosProcessor())
+		      .process(new EnvioLoteEventosProcessor())
 		        .to(wsRecepcaoEndpoint)
 		        .setBody(bodyAs(br.gov.fazenda.sped.ReceberLoteEventoResult.class))
 				.process(new RetornoEventoProcessor())

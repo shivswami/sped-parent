@@ -1,15 +1,15 @@
 package net.jlstechnology.efinanceira.processor;
 
-import java.util.Calendar;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
+//import java.util.Calendar;
+//
+//import javax.inject.Inject;
+//import javax.xml.bind.JAXBContext;
+//import javax.xml.bind.Unmarshaller;
+//
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Node;
+//import org.springframework.stereotype.Component;
+//import org.w3c.dom.Node;
 
 //import br.com.fachesf.efinanceira.repository.GravarRetornoRepository;
 //import br.com.fachesf.efinanceira.repository.GravarRetornoXmlRepository;

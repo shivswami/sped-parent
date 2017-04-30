@@ -14,7 +14,7 @@ spring:
     username: null
     password: null
   jpa:
-    database-platform: io.github.jhipster.domain.util.FixedH2Dialect
+    database-platform: net.jlstechnology.efinanceira.domain.util.FixedH2Dialect
     database: H2
     open-in-view: false
     show-sql: true
