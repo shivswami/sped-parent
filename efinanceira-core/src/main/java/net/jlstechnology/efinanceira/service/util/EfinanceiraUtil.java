@@ -1,5 +1,11 @@
 package net.jlstechnology.efinanceira.service.util;
 
+import java.util.List;
+import java.util.UUID;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
 /**
  * 
  * @author Thiago Tenorio
@@ -30,8 +36,23 @@ public class EfinanceiraUtil {
 		eFinanceira.setLoteEventos(loteEventos);
 		return eFinanceira;
 	}
+	
+	public static <T> br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.EFinanceira adicionarLoteEventos(final List<T> beans) throws Exception {
+		br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.EFinanceira.LoteEventos loteEventos = FACTORY_ENVIO_LOTES.createEFinanceiraLoteEventos();
+		
+		beans.stream().parallel().forEach(bean -> {
+			try {
+				loteEventos.getEvento().add(converterTArquivoeFinanceira(bean));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});	
+		br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.EFinanceira eFinanceira = FACTORY_ENVIO_LOTES.createEFinanceira();
+		eFinanceira.setLoteEventos(loteEventos);
+		return eFinanceira;		
+	}
 
-	public static <T> br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.TArquivoeFinanceira converterTArquivoeFinanceira(T bean) throws Exception {
+	private static <T> br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.TArquivoeFinanceira converterTArquivoeFinanceira(T bean) throws ParserConfigurationException, JAXBException  {
 
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 		javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
@@ -43,6 +64,7 @@ public class EfinanceiraUtil {
 		
 		br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.TArquivoeFinanceira tArquivoeFinanceira = FACTORY_ENVIO_LOTES.createTArquivoeFinanceira();
 		tArquivoeFinanceira.setAny(document.getDocumentElement());
+		tArquivoeFinanceira.setId(UUID.randomUUID().toString());
 		return tArquivoeFinanceira;
 	}
 }

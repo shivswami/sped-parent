@@ -5,13 +5,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-import br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.EFinanceira;
-
 public interface IAberturaService {
 	
 	@POST
     @Path("/xml")
-    Response criarXmlAbertura(EFinanceira abertura);
+    Response criarXmlAbertura(br.gov.efinanceira.schemas.evtaberturaefinanceira.v1_0_1.EFinanceira abertura);
 	
 	@DELETE
     @Path("/xml")
