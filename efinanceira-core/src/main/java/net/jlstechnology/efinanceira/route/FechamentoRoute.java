@@ -40,10 +40,10 @@ public class FechamentoRoute extends SpringRouteBuilder {
 				+ "&bindingStyle=SimpleConsumer"
 				+ "&providers=#jacksonJsonProvider"
 				+ "&schemaLocations=#classpath:xsd/evtFechamentoeFinanceira-v1_0_1.xsd").routeId("rota-cxfrs-fechamento")
-		  .recipientList(simple("seda:${header.operationName}"));
+		  .recipientList(simple("direct:${header.operationName}"));
 		
 		// ROTA CRIAR XML FECHAMENTO
-		from("seda:criarXmlFechamento").routeId("rota-criar-xml-fechamento")
+		from("direct:criarXmlFechamento").routeId("rota-criar-xml-fechamento")
 		.to("file:target/www/xml/fechamento/nao_assinado/?fileName=evtFechamentoeFinanceira.xml&charset=utf-8")
 		    .pollEnrich("file:target/www/xml/fechamento/nao_assinado/?fileName=evtFechamentoeFinanceira.xml&charset=utf-8")
 		        .unmarshal(dataFormat) 
@@ -51,17 +51,21 @@ public class FechamentoRoute extends SpringRouteBuilder {
 		            .end()
 		        .setHeader("nomeElemento", constant("evtFechamentoeFinanceira"))
 		        .bean(AssinaturaDigital.class, "assinar")
-		    .to("file:target/www/xml/fechamento/assinado/?fileName=evtFechamentoeFinanceira-ASSINADO.xml&charset=utf-8");
+		    .to("file:target/www/xml/fechamento/assinado/?fileName=evtFechamentoeFinanceira-ASSINADO.xml&charset=utf-8")
+		    .  setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))
+			  .setBody(simple("null"))
+			.to("mock:result");
 		
 		// ROTA EXCLUIR XML FECHAMENTO
-		from("seda:deletarXmlFechamento").routeId("rota-deletar-xml-fechamento")
+		from("direct:deletarXmlFechamento").routeId("rota-deletar-xml-fechamento")
 		  .pollEnrich("file:target/www/xml/fechamento/assinado/?fileName=evtFechamentoeFinanceira-ASSINADO.xml&delete=true")
-		  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))
-		  .setBody(simple("null"))
-		.to("log:INFO");
+		    .end()
+	        .setBody(simple("null"))
+	        .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))		    
+		.to("mock:result");
 		
 		// TRANSMITIR
-		from("seda:transmitirXmlFechamento?timeout=100000").routeId("rota-transmitir-xml-fechamento")
+		from("direct:transmitirXmlFechamento?timeout=100000").routeId("rota-transmitir-xml-fechamento")
 		  .pollEnrich("file:target/www/xml/fechamento/assinado/?fileName=evtFechamentoeFinanceira-ASSINADO.xml&charset=utf-8")
 		  .setHeader("XmlAssinado", simple("${body}"))
 		      .process(new Processor() {
@@ -76,8 +80,10 @@ public class FechamentoRoute extends SpringRouteBuilder {
 				}).to(wsRecepcaoEndpoint)
 		        .setBody(bodyAs(br.gov.fazenda.sped.ReceberLoteEventoResult.class))
 				.process(new RetornoEventoProcessor())
-				  .end()
-				  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
+				.end()
+		        .setBody(simple("null"))
+		        .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))		    
+			.to("mock:result");
 	}
 
 }

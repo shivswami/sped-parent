@@ -52,7 +52,7 @@ public class EfinanceiraUtil {
 		return eFinanceira;		
 	}
 
-	private static <T> br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.TArquivoeFinanceira converterTArquivoeFinanceira(T bean) throws ParserConfigurationException, JAXBException  {
+	public static <T> br.gov.efinanceira.schemas.envioloteeventos.v1_0_1.TArquivoeFinanceira converterTArquivoeFinanceira(T bean) throws ParserConfigurationException, JAXBException  {
 
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 		javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();

@@ -4,7 +4,6 @@ import javax.inject.Inject;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
 import org.springframework.stereotype.Component;
@@ -56,14 +55,19 @@ public class MovimentoRoute extends SpringRouteBuilder {
 		        
 		        .setHeader("nomeElemento", constant("evtMovOpFin"))
 		        .bean(AssinaturaDigital.class, "assinar")
-		    .to("file:target/www/xml/movimento/assinado/?fileName=evtMovOpFin-${date:now:yyyyMMddHHmmssSSS}-ASSINADO.xml&charset=utf-8");
+		    .to("file:target/www/xml/movimento/assinado/?fileName=evtMovOpFin-${date:now:yyyyMMddHHmmssSSS}-ASSINADO.xml&charset=utf-8")
+		    .end()
+		    .setBody(simple("null"))
+		    .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))		    
+			.to("mock:result");
 		
 		// ROTA EXCLUIR XML MOVIMENTO
 		from("seda:deletarXmlMovimento").routeId("rota-deletar-xml-movimento")
 		  .pollEnrich("file:target/www/xml/movimento/assinado/?fileName=evtMovOpFin-${date:now:yyyyMMddHHmmssSSS}-ASSINADO.xml&delete=true")
-		  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))
-		  .setBody(simple("null"))
-		.to("log:INFO");
+		  .end()
+		    .setBody(simple("null"))
+		    .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))		    
+			.to("mock:result");
 		
 		// TRANSMITIR
 		from("seda:transmitirXmlMovimento?timeout=100000").routeId("rota-transmitir-xml-movimento")
@@ -73,8 +77,10 @@ public class MovimentoRoute extends SpringRouteBuilder {
 		        .to(wsRecepcaoEndpoint)
 		        .setBody(bodyAs(br.gov.fazenda.sped.ReceberLoteEventoResult.class))
 				.process(new RetornoEventoProcessor())
-				  .end()
-				  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
+				.end()
+			    .setBody(simple("null"))
+			    .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))		    
+				.to("mock:result");
 	}
 
 }

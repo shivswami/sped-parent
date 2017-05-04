@@ -9,6 +9,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 
+import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,13 +17,12 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import net.jlstechnology.Application;
 
-@RunWith(SpringRunner.class)
+@RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(webEnvironment= WebEnvironment.DEFINED_PORT, classes = Application.class)
 public class AberturaRouteTest {
 

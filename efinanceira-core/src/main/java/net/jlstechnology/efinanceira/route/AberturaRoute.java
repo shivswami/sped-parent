@@ -8,6 +8,7 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
 import org.springframework.stereotype.Component;
 
+import net.jlstechnology.efinanceira.processor.DeletaEventoXMLProcessor;
 import net.jlstechnology.efinanceira.processor.EnvioLoteEventosProcessor;
 import net.jlstechnology.efinanceira.processor.LoteEventosProcessor;
 import net.jlstechnology.efinanceira.processor.RetornoEventoProcessor;
@@ -32,6 +33,8 @@ public class AberturaRoute extends SpringRouteBuilder {
 		dfAbertura.setSchema("file:src/main/resources/xsd/evtAberturaeFinanceira-v1_0_1.xsd");
 		dfAbertura.setFragment(true);
 		
+		
+		
 		// API
 		from("cxfrs:///abertura?"
 				+ "resourceClasses=" + IAberturaService.class.getName()	
@@ -49,14 +52,18 @@ public class AberturaRoute extends SpringRouteBuilder {
 		            .end()
 		        .setHeader("nomeElemento", constant("evtAberturaeFinanceira"))
 		        .bean(AssinaturaDigital.class, "assinar")
-		    .to("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&charset=utf-8");
+		    .to("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&charset=utf-8")
+	        .setBody(simple("null"))
+	        .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))		    
+		.to("mock:result");
 		
 		// ROTA EXCLUIR XML ABERTURA
 		from("seda:deletarXmlAbertura").routeId("rota-deletar-xml-abertura")
+		  .setHeader("diretorio", constant("target/www/xml/abertura/assinado"))
 		  .pollEnrich("file:target/www/xml/abertura/assinado/?fileName=evtAberturaeFinanceira-ASSINADO.xml&delete=true")
-		  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))
-		  .setBody(simple("null"))
-		.to("log:INFO");
+		  //.setBody(simple("null"))
+	        //.setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))		    
+		.to("mock:result");
 		
 		// TRANSMITIR
 		from("seda:transmitirXmlAbertura?timeout=100000").routeId("rota-transmitir-xml-abertura")
@@ -66,8 +73,9 @@ public class AberturaRoute extends SpringRouteBuilder {
 		        .to(wsRecepcaoEndpoint)
 		        .setBody(bodyAs(br.gov.fazenda.sped.ReceberLoteEventoResult.class))
 				.process(new RetornoEventoProcessor())
-				  .end()
-				  .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200));
+		        .setBody(simple("null"))
+		        .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))		    
+			.to("mock:result");
 	}
 
 }
