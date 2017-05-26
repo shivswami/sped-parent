@@ -1,6 +1,7 @@
 camel:
   springboot:
     name: EFinanceiraContext
+    tracing: true
 spring:
   application:
     name: efinanceira-core

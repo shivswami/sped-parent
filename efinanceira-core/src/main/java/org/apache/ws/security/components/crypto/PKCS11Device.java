@@ -192,11 +192,12 @@ public class PKCS11Device extends Merlin {
 	        }
 	    }
 	
+	@SuppressWarnings("restriction")
 	@Override
 	protected KeyStore load(InputStream input, String storepass, String provider, String type) throws WSSecurityException {
 		KeyStore ks = null;
 		
-		sun.security.pkcs11.SunPKCS11 akisProvider = new sun.security.pkcs11.SunPKCS11("pkcs.properties");
+		sun.security.pkcs11.SunPKCS11 akisProvider = new sun.security.pkcs11.SunPKCS11(ClassLoader.getSystemResource("SmartCard.properties").getPath());
 		Security.addProvider(akisProvider);
 
         try {

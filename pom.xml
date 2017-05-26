@@ -15,7 +15,7 @@
 
     <modules>
         <module>efinanceira-core</module>
-        <module>sped</module>
+        <module>sped-api</module>
     </modules>
 
     <properties>
